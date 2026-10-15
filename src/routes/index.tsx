@@ -81,7 +81,7 @@ function TeacherTimerPage() {
   const summaryText = [
     '会议已结束 各位老师发言时长如下：',
     ...teachers.map(
-      (t) => `${t.name}老师 ${formatDuration(getTeacherTotalSeconds(t))}`
+      (t) => `${t.name}老师 ${formatDuration(getTeacherTotalSeconds(t))}`,
     ),
   ].join('\n')
 
@@ -98,7 +98,7 @@ function TeacherTimerPage() {
         <div className="flex flex-col justify-between gap-4 rounded-xl bg-white p-6 shadow-sm sm:flex-row sm:items-center border">
           <div>
             <h1 className="text-2xl font-bold tracking-tight text-slate-900">
-              老师计时管理系统
+              医疗会议计时
             </h1>
             <p className="text-sm text-slate-500">
               自动保存本地进度，支持中断后继续补时与会议汇总
@@ -279,13 +279,16 @@ function TeacherTimerCard({
 
   const totalElapsedSeconds = teacher.accumulatedSeconds + currentRunningSeconds
   const isSatisfied = totalElapsedSeconds >= teacher.requiredSeconds
-  const remainingSeconds = Math.max(0, teacher.requiredSeconds - totalElapsedSeconds)
+  const remainingSeconds = Math.max(
+    0,
+    teacher.requiredSeconds - totalElapsedSeconds,
+  )
 
   const expectedSatisfyTime = (() => {
     if (teacher.status === 'running' && teacher.startTime) {
       const neededFromThisSession = Math.max(
         0,
-        teacher.requiredSeconds - teacher.accumulatedSeconds
+        teacher.requiredSeconds - teacher.accumulatedSeconds,
       )
       return teacher.startTime + neededFromThisSession * 1000
     }
@@ -326,49 +329,52 @@ function TeacherTimerCard({
               <span className="ml-1 font-mono text-lg font-bold text-slate-900">
                 {formatDuration(totalElapsedSeconds)}
               </span>
-              {teacher.accumulatedSeconds > 0 && teacher.status === 'running' && (
-                <span className="ml-2 text-xs text-slate-400">
-                  (含前序累计 {formatDuration(teacher.accumulatedSeconds)})
-                </span>
-              )}
+              {teacher.accumulatedSeconds > 0 &&
+                teacher.status === 'running' && (
+                  <span className="ml-2 text-xs text-slate-400">
+                    (含前序累计 {formatDuration(teacher.accumulatedSeconds)})
+                  </span>
+                )}
             </div>
 
-            {teacher.status !== 'idle' && displayStartTime && expectedSatisfyTime && (
-              <div className="space-y-1.5 pt-2 text-sm">
-                <p className="text-slate-700 bg-slate-100 px-3 py-1.5 rounded-md">
-                  <span className="font-semibold">{teacher.name}</span> 老师于{' '}
-                  <span className="font-mono font-medium text-blue-700">
-                    {formatDateTime(displayStartTime)}
-                  </span>{' '}
-                  开始，需{' '}
-                  <span className="font-mono font-medium text-blue-700">
-                    {formatDateTime(expectedSatisfyTime)}
-                  </span>{' '}
-                  可以结束满足时长
-                </p>
+            {teacher.status !== 'idle' &&
+              displayStartTime &&
+              expectedSatisfyTime && (
+                <div className="space-y-1.5 pt-2 text-sm">
+                  <p className="text-slate-700 bg-slate-100 px-3 py-1.5 rounded-md">
+                    <span className="font-semibold">{teacher.name}</span> 老师于{' '}
+                    <span className="font-mono font-medium text-blue-700">
+                      {formatDateTime(displayStartTime)}
+                    </span>{' '}
+                    开始，需{' '}
+                    <span className="font-mono font-medium text-blue-700">
+                      {formatDateTime(expectedSatisfyTime)}
+                    </span>{' '}
+                    可以结束满足时长
+                  </p>
 
-                {teacher.status === 'ended' && teacher.endTime && (
-                  <>
-                    {isSatisfied ? (
-                      <p className="rounded-md bg-emerald-50 px-3 py-1.5 font-medium text-emerald-700 border border-emerald-200">
-                        {teacher.name} 老师于{' '}
-                        <span className="font-mono">
-                          {formatDateTime(teacher.endTime)}
-                        </span>{' '}
-                        结束满足时长
-                      </p>
-                    ) : (
-                      <p className="rounded-md bg-red-50 px-3 py-1.5 font-medium text-red-700 border border-red-200">
-                        {teacher.name} 老师不满足时长需要补充{' '}
-                        <span className="font-mono font-bold">
-                          {formatDuration(remainingSeconds)}
-                        </span>
-                      </p>
-                    )}
-                  </>
-                )}
-              </div>
-            )}
+                  {teacher.status === 'ended' && teacher.endTime && (
+                    <>
+                      {isSatisfied ? (
+                        <p className="rounded-md bg-emerald-50 px-3 py-1.5 font-medium text-emerald-700 border border-emerald-200">
+                          {teacher.name} 老师于{' '}
+                          <span className="font-mono">
+                            {formatDateTime(teacher.endTime)}
+                          </span>{' '}
+                          结束满足时长
+                        </p>
+                      ) : (
+                        <p className="rounded-md bg-red-50 px-3 py-1.5 font-medium text-red-700 border border-red-200">
+                          {teacher.name} 老师不满足时长需要补充{' '}
+                          <span className="font-mono font-bold">
+                            {formatDuration(remainingSeconds)}
+                          </span>
+                        </p>
+                      )}
+                    </>
+                  )}
+                </div>
+              )}
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
