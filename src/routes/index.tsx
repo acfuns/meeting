@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 import { useTeacherStore, type TeacherRecord } from '../store/useTeacherStore'
-import { formatDateTime, formatDuration } from '../utils/time'
+import { formatDateTime, formatDuration, formatTime } from '../utils/time'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -77,11 +77,23 @@ function TeacherTimerPage() {
     return t.accumulatedSeconds + runningSec
   }
 
+  // 会议汇总逐行数据：时长后面追加是否满足时长的判定
+  const summaryLines = teachers.map((t) => {
+    const totalSeconds = getTeacherTotalSeconds(t)
+    return {
+      id: t.id,
+      name: t.name,
+      durationText: formatDuration(totalSeconds),
+      isSatisfied: totalSeconds >= t.requiredSeconds,
+    }
+  })
+
   // 生成用于展示和复制的会议汇总纯文本
   const summaryText = [
     '会议已结束 各位老师发言时长如下：',
-    ...teachers.map(
-      (t) => `${t.name}老师 ${formatDuration(getTeacherTotalSeconds(t))}`,
+    ...summaryLines.map(
+      (line) =>
+        `${line.name}老师 ${line.durationText} ${line.isSatisfied ? '满足时长' : '不满足时长'}`,
     ),
   ].join('\n')
 
@@ -166,8 +178,22 @@ function TeacherTimerPage() {
               </Button>
             </CardHeader>
             <CardContent>
-              <div className="rounded-lg bg-white p-4 font-mono text-sm leading-relaxed text-slate-800 border border-emerald-200 whitespace-pre-line">
-                {summaryText}
+              <div className="rounded-lg bg-white p-4 font-mono text-sm leading-relaxed text-slate-800 border border-emerald-200">
+                <p>会议已结束 各位老师发言时长如下：</p>
+                {summaryLines.map((line) => (
+                  <p key={line.id}>
+                    {line.name}老师 {line.durationText}{' '}
+                    <span
+                      className={
+                        line.isSatisfied
+                          ? 'font-bold text-emerald-600'
+                          : 'font-bold text-red-600'
+                      }
+                    >
+                      {line.isSatisfied ? '满足时长' : '不满足时长'}
+                    </span>
+                  </p>
+                ))}
               </div>
             </CardContent>
           </Card>
@@ -344,11 +370,11 @@ function TeacherTimerCard({
                   <p className="text-slate-700 bg-slate-100 px-3 py-1.5 rounded-md">
                     <span className="font-semibold">{teacher.name}</span> 老师于{' '}
                     <span className="font-mono font-medium text-blue-700">
-                      {formatDuration(displayStartTime)}
+                      {formatTime(displayStartTime)}
                     </span>{' '}
                     开始，需{' '}
                     <span className="font-mono font-medium text-blue-700">
-                      {formatDuration(expectedSatisfyTime)}
+                      {formatTime(expectedSatisfyTime)}
                     </span>{' '}
                     可以结束满足时长
                   </p>
@@ -359,7 +385,7 @@ function TeacherTimerCard({
                         <p className="rounded-md bg-emerald-50 px-3 py-1.5 font-medium text-emerald-700 border border-emerald-200">
                           {teacher.name} 老师于{' '}
                           <span className="font-mono">
-                            {formatDuration(teacher.endTime)}
+                            {formatTime(teacher.endTime)}
                           </span>{' '}
                           结束满足时长
                         </p>

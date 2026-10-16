@@ -27,3 +27,14 @@ export function formatDuration(totalSeconds: number): string {
 
   return parts.join('')
 }
+
+export function formatTime(timestamp: number): string {
+  const date = new Date(timestamp)
+  const pad = (n: number) => String(n).padStart(2, '0')
+
+  const hours = pad(date.getHours())
+  const minutes = pad(date.getMinutes())
+  const seconds = pad(date.getSeconds())
+
+  return `${hours}:${minutes}:${seconds}`
+}
