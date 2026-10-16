@@ -344,11 +344,11 @@ function TeacherTimerCard({
                   <p className="text-slate-700 bg-slate-100 px-3 py-1.5 rounded-md">
                     <span className="font-semibold">{teacher.name}</span> 老师于{' '}
                     <span className="font-mono font-medium text-blue-700">
-                      {formatDateTime(displayStartTime)}
+                      {formatDuration(displayStartTime)}
                     </span>{' '}
                     开始，需{' '}
                     <span className="font-mono font-medium text-blue-700">
-                      {formatDateTime(expectedSatisfyTime)}
+                      {formatDuration(expectedSatisfyTime)}
                     </span>{' '}
                     可以结束满足时长
                   </p>
@@ -359,7 +359,7 @@ function TeacherTimerCard({
                         <p className="rounded-md bg-emerald-50 px-3 py-1.5 font-medium text-emerald-700 border border-emerald-200">
                           {teacher.name} 老师于{' '}
                           <span className="font-mono">
-                            {formatDateTime(teacher.endTime)}
+                            {formatDuration(teacher.endTime)}
                           </span>{' '}
                           结束满足时长
                         </p>
